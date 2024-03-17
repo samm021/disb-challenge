@@ -1,13 +1,40 @@
 package main
 
 import (
+	"disbursement-service/domain"
+	"disbursement-service/internal/api"
+	"disbursement-service/internal/config"
+	"disbursement-service/internal/database"
+	"disbursement-service/internal/middleware"
+	"disbursement-service/internal/repository"
+	"disbursement-service/internal/service"
+	"fmt"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
+	config := config.Get()
 	app := fiber.New()
 
-	log.Print(app.Listen(":3000"))
+	// connect to DB & run initial migration
+	dbConnection := database.GetDatabaseConnection(config)
+	database.InitMigration(dbConnection, &domain.User{}, &domain.Transaction{})
+
+	// instantiate repositories
+	transactionRepository := repository.NewTransaction(dbConnection)
+	userRepository := repository.NewUser(dbConnection)
+
+	// instantiate services
+	transactionService := service.NewTransaction(transactionRepository)
+	userService := service.NewUser(userRepository)
+
+	// instantiate middlewares
+	authMiddleware := middleware.Authenticate(userService)
+
+	// instantiate routes
+	api.NewTransaction(app, authMiddleware, transactionService)
+
+	log.Print(app.Listen(fmt.Sprintf(":%s", config.Server.Port)))
 }
