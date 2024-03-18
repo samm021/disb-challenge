@@ -86,15 +86,16 @@ func (t transactionService) CreateTransaction(ctx context.Context, req dto.Trans
 		IdempotencyKey: fmt.Sprintf("key-%X", idempotencyKey),
 	}
 
+	// TODO: proper DB transaction starting here & ends after successful call to PG
 	t.transactionRepository.Create(ctx, &transaction)
 	t.userService.UpdateAvailableBalance(ctx, &user, user.AvailableBalance.Sub(transactionAmount))
 
-	// TODO: add more transaction type
 	if transactionType != "DISBURSEMENT" {
 		return dto.TransactionRes{}, errors.New("payment type not supported")
 	}
 
 	// TODO: fix create payout
+
 	res, err := t.xenditService.CreateDisbursementPayout(ctx, &transaction)
 	if err != nil {
 		return dto.TransactionRes{}, errors.New("error when creating disbursement")

@@ -31,7 +31,7 @@ func Authenticate(userService domain.UserService) fiber.Handler {
 			return []byte(secretKey), nil
 		})
 
-		// skip validating token is valid or not
+		// TODO: Proper validation of token
 		// if err != nil || !token.Valid {
 		// 	return ctx.SendStatus(401)
 		// }
