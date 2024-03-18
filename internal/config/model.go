@@ -3,6 +3,7 @@ package config
 type Config struct {
 	Server   Server
 	Database Database
+	Xendit   Xendit
 }
 
 type Server struct {
@@ -16,4 +17,9 @@ type Database struct {
 	// Password string
 	// Host     string
 	// Port     string
+}
+
+type Xendit struct {
+	XApiKey        string
+	xCallbackToken string
 }

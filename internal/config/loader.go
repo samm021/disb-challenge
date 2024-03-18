@@ -20,5 +20,9 @@ func Get() *Config {
 		Database{
 			Name: os.Getenv("DB_NAME"),
 		},
+		Xendit{
+			XApiKey:        os.Getenv("X_API_KEY"),
+			xCallbackToken: os.Getenv("X_CALLBACK_TOKEN"),
+		},
 	}
 }

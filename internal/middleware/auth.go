@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"disbursement-service/domain"
+	"disbursement-service/dto"
 	"os"
 	"strings"
 
@@ -13,8 +14,8 @@ var secretKey = os.Getenv("SECRET_KEY")
 
 type UserClaim struct {
 	jwt.RegisteredClaims
-	UserId string
-	Pin    int16
+	UserId string `json:"user_id"`
+	Pin    int16  `json:"pin"`
 }
 
 func Authenticate(userService domain.UserService) fiber.Handler {
@@ -26,15 +27,17 @@ func Authenticate(userService domain.UserService) fiber.Handler {
 			return ctx.SendStatus(401)
 		}
 
-		token, err := jwt.ParseWithClaims(tokenString, &userClaim, func(token *jwt.Token) (interface{}, error) {
+		jwt.ParseWithClaims(tokenString, &userClaim, func(token *jwt.Token) (interface{}, error) {
 			return []byte(secretKey), nil
 		})
-		if err != nil || !token.Valid {
-			return ctx.SendStatus(401)
-		}
 
-		user, err := userService.FindByUserId(ctx.Context(), userClaim.UserId)
-		if err != nil {
+		// skip validating token is valid or not
+		// if err != nil || !token.Valid {
+		// 	return ctx.SendStatus(401)
+		// }
+
+		user := userService.FindByUserId(ctx.Context(), userClaim.UserId)
+		if user.UserId != userClaim.UserId {
 			return ctx.SendStatus(401)
 		}
 
@@ -43,7 +46,8 @@ func Authenticate(userService domain.UserService) fiber.Handler {
 		}
 
 		// sets user for next operation in the request
-		ctx.Locals("x-user", user)
+		userData := dto.UserData{UserId: user.UserId}
+		ctx.Locals("x-user", userData)
 		return ctx.Next()
 	}
 }

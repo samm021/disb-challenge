@@ -3,6 +3,8 @@ package api
 import (
 	"disbursement-service/domain"
 	"disbursement-service/dto"
+	xenditDto "disbursement-service/dto/xendit"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -31,7 +33,7 @@ func (t transactionApi) CreateTransaction(ctx *fiber.Ctx) error {
 	res, err := t.transactionService.CreateTransaction(ctx.Context(), req)
 	if err != nil {
 		return ctx.Status(400).JSON(dto.Response{
-			Message: "Invalid Body",
+			Message: "",
 		})
 	}
 
@@ -39,7 +41,15 @@ func (t transactionApi) CreateTransaction(ctx *fiber.Ctx) error {
 }
 
 func (t transactionApi) UpdateTransaction(ctx *fiber.Ctx) error {
-	var req dto.TransactionReq
+	var req xenditDto.XenditPayoutCallbackReq
+
+	xCallbackToken, webhookId := ctx.Get("x-callback-token"), ctx.Get("webhook-id")
+
+	if xCallbackToken != os.Getenv("X_CALLBACK_TOKEN") {
+		return ctx.Status(400).JSON(dto.Response{
+			Message: "Invalid token",
+		})
+	}
 
 	err := ctx.BodyParser(&req)
 	if err != nil {
@@ -48,10 +58,10 @@ func (t transactionApi) UpdateTransaction(ctx *fiber.Ctx) error {
 		})
 	}
 
-	res, err := t.transactionService.CreateTransaction(ctx.Context(), req)
+	res, err := t.transactionService.UpdateTransactionStatus(ctx.Context(), req, webhookId)
 	if err != nil {
 		return ctx.Status(400).JSON(dto.Response{
-			Message: "Invalid Body",
+			Message: "",
 		})
 	}
 

@@ -1,8 +1,9 @@
 package dto
 
 type TransactionReq struct {
-	Amount        int64   `json:"amount"`
+	Amount        float32 `json:"amount"`
 	ChannelCode   string  `json:"channel_code"`
+	Type          string  `json:"type"`
 	Currency      string  `json:"currency"`
 	Description   *string `json:"description"`
 	AccountNumber string  `json:"account_number"`
@@ -11,4 +12,5 @@ type TransactionReq struct {
 
 type TransactionRes struct {
 	ReferenceId string `json:"reference_id"`
+	Status      string `json:"status"`
 }

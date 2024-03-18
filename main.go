@@ -23,12 +23,13 @@ func main() {
 	database.InitMigration(dbConnection, &domain.User{}, &domain.Transaction{})
 
 	// instantiate repositories
-	transactionRepository := repository.NewTransaction(dbConnection)
 	userRepository := repository.NewUser(dbConnection)
+	transactionRepository := repository.NewTransaction(dbConnection)
 
 	// instantiate services
-	transactionService := service.NewTransaction(transactionRepository)
+	xenditService := service.NewXendit(config)
 	userService := service.NewUser(userRepository)
+	transactionService := service.NewTransaction(transactionRepository, userService, xenditService)
 
 	// instantiate middlewares
 	authMiddleware := middleware.Authenticate(userService)
