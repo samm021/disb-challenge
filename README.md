@@ -35,7 +35,7 @@ Topic: The user has a balance in the application wallet and the balance wants to
 
 ## architecture/decision
 
-- Refer to rough C4 diagram [here](https://github.com/samm021/sitemate-challenge-node-cli)
+- Refer to rough sequence diagram [here](https://www.mermaidchart.com/app/projects/1101b14d-7c33-4399-ba36-da79689c4d39/diagrams/7928b976-a813-4b9d-a240-8cfce8fcba75/version/v0.1/edit)
 
 ## TODOs
 
